@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习资料入口</title>
+    
+    <!-- 微信卡片核心标签 -->
+    <meta property="og:title" content="学习资料入口 - 多渠道访问链接">
+    <meta property="og:description" content="包含多个学习资料访问入口，点击即可获取所需学习资源">
+    <meta property="og:image" content="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/db9277fd93164ae0bdd56be8d7a57ec8.jpg~tplv-a9rns2rl98-24:720:720.image">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="你的网页在线访问地址">
+    
+    <!-- 微信公众平台专用标签（可选） -->
+    <meta name="wechat-title" content="学习资料入口">
+    <meta name="wechat-description" content="多个学习资料访问渠道，一键直达">
+    <meta name="wechat-image" content="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/db9277fd93164ae0bdd56be8d7a57ec8.jpg~tplv-a9rns2rl98-24:720:720.image">
+
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 右上角动态箭头样式 */
+        .corner-indicator {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            width: 100px;
+            height: 100px;
+            z-index: 9998;
+            display: none; /* 默认隐藏 */
+            pointer-events: none; /* 不影响其他元素点击 */
+        }
+        
+        /* 呼吸动画 */
+        @keyframes breathe {
+            0% { transform: scale(1) rotate(-20deg); opacity: 0.8; }
+            50% { transform: scale(1.2) rotate(-20deg); opacity: 1; }
+            100% { transform: scale(1) rotate(-20deg); opacity: 0.8; }
+        }
+        
+        /* 微信环境显示箭头 */
+        .wechat-env .corner-indicator {
+            display: block;
+        }
+        
+        .arrow-animation {
+            animation: breathe 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+        
+        /* 微信提示样式 */
+        .wechat-tip {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #856404;
+            text-align: center;
+        }
+        
+        .wechat-tip strong {
+            color: #d63384;
+        }
+        
+        /* 卡片容器 */
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 卡片样式 */
+        .card {
+            height: 70px;
+            width: 350px;
+            border-radius: 50px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 卡片点击提示 */
+        .card .hint {
+            position: absolute;
+            bottom: -20px;
+            font-size: 12px;
+            color: #666;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .card:hover .hint {
+            opacity: 1;
+        }
+        
+        /* 卡片点击反馈 */
+        .card:active {
+            transform: scale(0.98);
+        }
+        
+        /* 链接样式 */
+        .card a {
+            text-align: center;
+            display: block;
+            width: 100%;
+            font-size: 20px;
+            text-decoration: none;
+            padding: 0 20px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* 入口背景颜色 */
+        .A, .AA, .AAA { background-color: red; }       /* 入口一、二、三：红色 */
+        .AAAA { background-color: purple; }            /* 入口四：紫色 */
+        .AAAAA { background-color: orange; }           /* 入口五：橙色 */
+        
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        /* 底部说明 */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* 弹窗样式 */
+        .guide-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .modal-inner {
+            width: 100%;
+            max-width: 350px;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-title {
+            background-color: #e63946;
+            color: white;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .modal-steps {
+            padding: 20px;
+        }
+
+        .step-item {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background-color: #2196f3;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .modal-button {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* 微信环境下弹窗按钮不可点击 */
+        .wechat-env .modal-button {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <!-- 右上角动态红色箭头 -->
+    <div class="corner-indicator">
+        <svg class="arrow-animation" width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- 箭身 -->
+            <line x1="10" y1="90" x2="80" y2="20" 
+                  stroke="#e63946" stroke-width="10"
+                  stroke-linecap="round"/>
+            <!-- 箭头 -->
+            <polygon points="80,10 95,35 65,35"
+                     fill="#e63946"
+                     transform="translate(9.5, 0) rotate(40 80 10)"/>
+        </svg>
+    </div>
+
+    <h1>学习资料入口</h1>
+    
+    <!-- 微信使用提示 -->
+    <div class="wechat-tip">
+        <strong>如打不开 点击右上角···选择-在浏览器中打开</strong>
+    </div>
+    
+    <!-- 卡片容器 -->
+    <div class="card-container">
+        <div class="card A">
+            <a href="http://vr.njhnzx.com/?OLH=jYrvFf4ALH8sKR0bzmI8" target="_blank" rel="noopener noreferrer">入口一</a> 
+        </div>
+        
+        <div class="card AA">
+            <a href="http://gc2.kmsd1818.cn/?TA=jYrvFf4ALH8sKR0bzmI8" target="_blank" rel="noopener noreferrer">入口二</a> 
+        </div>
+        
+        <div class="card AAA">
+            <a href="http://admin.fenyiban.cn/?EZ=jYrvFf4ALH8sKR0bzmI8" target="_blank" rel="noopener noreferrer">入口三</a>
+        </div>
+        
+        <div class="card AAAA">
+            <a href="http://zxkj.zxpalmpay.com/?370133,5575,x" target="_blank" rel="noopener noreferrer">入口四</a>        
+        </div>
+        
+        <div class="card AAAAA">
+            <a href="http://juzu.shileizuji.com/?KNS=VdU6jdkLomAJFc4rINjNJFdPgiezSYyM2wYhMBLPR2aCRot8N9ndf" target="_blank" rel="noopener noreferrer">入口五</a>        
+        </div>
+    </div>
+
+    <!-- 底部说明 -->
+    <div class="footer">
+        如无法打开，请尝试复制链接到浏览器访问
+    </div>
+    
+    <!-- 步骤弹窗 -->
+    <div id="browserGuideModal" class="guide-modal">
+        <div class="modal-inner">
+            <div class="modal-title">请按以下步骤在浏览器打开</div>
+            <div class="modal-steps">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-text">点击页面右上角的「···」图标</div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-text">在弹出的菜单中选择「在浏览器打开」</div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-text">自动跳转后，即可选择线路访问</div>
+                </div>
+                
+                <button class="modal-button">跳转失败？请点击右上角[···]</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 检测是否在微信浏览器中
+        function isWeChatBrowser() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf('micromessenger') !== -1;
+        }
+        
+        // 页面初始化
+        window.onload = function() {
+            const modal = document.getElementById('browserGuideModal');
+            const body = document.body;
+            const indicator = document.querySelector('.corner-indicator');
+            const cardLinks = document.querySelectorAll('.card a');
+            
+            // 微信环境处理
+            if (isWeChatBrowser()) {
+                body.classList.add('wechat-env');
+                modal.style.display = 'flex'; // 显示弹窗
+                indicator.style.display = 'block'; // 显示箭头
+                
+                // 微信中阻止卡片链接点击
+                cardLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                    });
+                });
+            } else {
+                // 浏览器环境处理
+                modal.style.display = 'none'; // 隐藏弹窗
+                indicator.style.display = 'none'; // 隐藏箭头
+                
+                // 浏览器中链接可正常点击（默认已开启，无需额外处理）
+            }
+            
+            // 弹窗按钮点击事件
+            document.querySelector('.modal-button').addEventListener('click', function() {
+                if (!isWeChatBrowser()) {
+                    alert('请尝试点击页面右上角的[···]图标，选择在浏览器中打开');
+                }
+            });
+        };
+        
+        // 长按复制链接功能（适配移动端）
+        document.querySelectorAll('.card').forEach(card => {
+            const link = card.querySelector('a').href;
+            
+            let pressTimer;
+            // 长按开始
+            card.addEventListener('touchstart', () => {
+                pressTimer = setTimeout(() => {
+                    // 复制链接到剪贴板
+                    navigator.clipboard.writeText(link).then(() => {
+                        alert('链接已复制：\n' + link);
+                    }).catch(err => {
+                        alert('复制失败，请手动复制链接');
+                    });
+                }, 800); // 长按800ms触发
+            });
+            
+            // 长按结束
+            card.addEventListener('touchend', () => {
+                clearTimeout(pressTimer);
+            });
+            
+            // 长按移动
+            card.addEventListener('touchmove', () => {
+                clearTimeout(pressTimer);
+            });
+        });
+    </script>
+</body>
+</html>
